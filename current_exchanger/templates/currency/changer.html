@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block content %}
+{% if request.user.is_authenticated %}
+<style>
+    /* Общий стиль */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .form-wrapper {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 400px;
+    }
+
+    .form-wrapper div {
+        margin: 15px 0;
+    }
+
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    input[type="text"]::placeholder, input[type="number"]::placeholder {
+        color: #aaa;
+    }
+
+    .alert {
+        background-color: #f0f0f0;
+        color: #333;
+        padding: 10px;
+        border-radius: 5px;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        max-width: 200px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logout-button {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #ff4d4f;
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 14px;
+        border: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .logout-button:hover {
+        background-color: #d9363e;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
+
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+</style>
+
+
+<div class="alert">
+    {{request.user.username}}<br>
+    <a href="{% url 'currency:logout' %}" class="logout-button">Logout</a>
+</div>
+
+<div class="form-wrapper">
+    <h1>Currency Converter</h1>
+    <div>
+        <datalist id="id_From">
+            {% for currency in currencies %}
+            <option value="{{currency.CharCode}}">{{currency.CharCode}}</option>
+            {% endfor %}
+        </datalist>
+        <input class="from" type="text" id="id_From" list="id_From" placeholder="From">
+    </div>
+    <div>
+        <datalist id="id_To">
+            {% for currency in currencies %}
+            <option value="{{currency.CharCode}}">{{currency.CharCode}}</option>
+            {% endfor %}
+        </datalist>
+        <input class="to" type="text" id="id_To" list="id_To" placeholder="To">
+    </div>
+    <div>
+        <input class="amount" type="number" id="id_Amount" placeholder="Amount">
+    </div>
+    <div>
+        <input class="total" type="number" id="id_Total" placeholder="Total">
+    </div>
+</div>
+{% endif %}
+<script>
+    let To = document.getElementsByClassName('to')[0];
+    let From = document.getElementsByClassName('from')[0];
+    let Result = document.getElementsByClassName('total')[0];
+    let Amount = document.getElementsByClassName('amount')[0];
+    let Val = {{Val|safe}}
+    To.addEventListener('change', function () {
+        Result.value = Val[From.value]['Value'] * Amount.value * Val[To.value]['Nominal'] / Val[To.value]['Value'] / Val[From.value]['Nominal'];
+    })
+
+    From.addEventListener('change', function () {
+        Result.value = Val[From.value]['Value'] * Amount.value * Val[To.value]['Nominal'] / Val[To.value]['Value'] / Val[From.value]['Nominal'];
+    })
+    Amount.addEventListener('change', function () {
+        if(Amount.value >= 0){
+            Result.value = Val[From.value]['Value'] * Amount.value * Val[To.value]['Nominal'] / Val[To.value]['Value'] / Val[From.value]['Nominal'];
+        } else{
+            Amount.setCustomValidity('Поддерживается ввод только неотрицательных чисел');
+            Amount.reportValidity();
+        }
+    })
+    Result.addEventListener('change', function () {
+        if(Result.value >= 0){
+            Amount.value = Result.value / (Val[From.value]['Value'] * Val[To.value]['Nominal'] / Val[To.value]['Value'] / Val[From.value]['Nominal'])
+        } else {
+            Result.setCustomValidity('Поддерживается ввод только неотрицательных чисел');
+            Result.reportValidity();
+        }
+    })
+</script>
+{% endblock content %}

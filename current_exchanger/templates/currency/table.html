@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+{% if request.user.is_authenticated %}
+<style>
+    /* Общий стиль */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .alert {
+        background-color: #f0f0f0;
+        color: #333;
+        padding: 10px;
+        border-radius: 5px;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        max-width: 200px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logout-button {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #ff4d4f;
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 14px;
+        border: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .logout-button:hover {
+        background-color: #d9363e;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
+
+    .container {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 50px auto;
+        max-width: 900px;
+    }
+
+    h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+        color: #333;
+        text-align: center;
+    }
+
+    hr {
+        border: none;
+        border-top: 2px solid #ddd;
+        margin: 10px 0;
+    }
+
+    .table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    .table th, .table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: center;
+        color: #555;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .table tr:nth-child(even) {
+        background-color: #f4f6f9;
+    }
+
+    .table tr:hover {
+        background-color: #e9ecef;
+    }
+</style>
+
+
+<div class="alert">
+    {{request.user.username}}<br>
+    <a href="{% url 'currency:logout' %}" class="logout-button">Logout</a>
+</div>
+
+
+{% endif %}
+<div class="container">
+    <h1 class="text-center" style="padding-top: 2em;">Current Exchanger</h1>
+    <hr style="weight: 1px; color: #000000;">
+    <table class="table table-bordered text-center">
+        <tr>
+            <th>UID</th>
+            <th>NumCode</th>
+            <th>CharCode</th>
+            <th>Nominal</th>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Previous</th>
+        </tr>
+        {%for currency in currencies%}
+        {%if currency.CharCode != 'RUB'%}
+        <tr>
+            <td>{{currency.UID}}</td>
+            <td>{{currency.NumCode}}</td>
+            <td>{{currency.CharCode}}</td>
+            <td>{{currency.Nominal}}</td>
+            <td>{{currency.Name}}</td>
+            <td>{{currency.Value}}</td>
+            <td>{{currency.Previous}}</td>
+        </tr>
+        {%endif%}
+        {% endfor %}
+    </table>
+</div>
+{% endblock content %}
